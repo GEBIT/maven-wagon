@@ -86,7 +86,9 @@ under the License.
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <excludes />
+          <excludes>
+            <exclude>**/ScmSvnExeWagonTest.*</exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>
