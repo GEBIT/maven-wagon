@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+	<!-- See GBLD-1728 for details -->
+	<mirrors>
+		<mirror>
+			<id>Nexus</id>
+			<name>All project dependencies</name>
+			<url>https://gebit-nexus.local.gebit.de/content/groups/gebit-dependencies</url>
+			<mirrorOf>external:*,!jenkins</mirrorOf>
+		</mirror>
+	</mirrors>
+
+	<!-- you will need a matching ~/.m2/security-settings.xml -->
+	<servers>
+		<server>
+			<id>gebit-releases</id>
+			<username>${env.NEXUS_GEBIT_BUILD_USERNAME}</username>
+			<password>${env.NEXUS_GEBIT_BUILD_PASSWORD}</password>
+		</server>
+		<server>
+			<id>gebit-integration</id>
+			<username>${env.NEXUS_GEBIT_BUILD_USERNAME}</username>
+			<password>${env.NEXUS_GEBIT_BUILD_PASSWORD}</password>
+		</server>
+		<server>
+			<id>gebit-snapshots</id>
+			<username>${env.NEXUS_GEBIT_BUILD_USERNAME}</username>
+			<password>${env.NEXUS_GEBIT_BUILD_PASSWORD}</password>
+		</server>
+
+		<!-- Defines the credentials for uploading of 3th party artifacts to the central repository -->
+		<server>
+			<id>thirdparty</id>
+			<username>${env.NEXUS_GEBIT_BUILD_USERNAME}</username>
+			<password>${env.NEXUS_GEBIT_BUILD_PASSWORD}</password>
+		</server>
+
+		<!-- Defines the user to deploy the site. Make sure the jenkins user has the correct key to access the server. -->
+		<server>
+			<id>gebit-maven-site</id>
+			<username>jenkins</username>
+		</server>
+
+		<!-- Jenkins repository for upstream builds. -->
+		<server>
+			<id>jenkins</id>
+			<username>${env.JENKINS_USERNAME}</username>
+			<password>${env.JENKINS_APITOKEN}</password>
+			<configuration>
+				<httpConfiguration>
+					<all>
+						<!-- Jenkins repositories for upstream builds require preemptive authentication. (for wagon transporter, Maven<3.9)-->
+						<usePreemptive>true</usePreemptive>
+					</all>
+				</httpConfiguration>
+			</configuration>
+		</server>
+	</servers>
+
+ 	<profiles>
+		<profile>
+			<id>nexus-profile</id>
+			<!-- Property 'aether.connector.http.preemptiveAuth' activates preemptive authentication for all servers.
+				 To activate it only for a specific server use server ID as suffix. E.g.: 'aether.connector.http.preemptiveAuth.jenkins'.
+				 These properties are required for preemptive authentication when using Maven 3.9, which introduces a new Maven resolver with HttpTransporter instead of WagonTransporter.
+				 HttpTransporter no longer respects the server configuration setting httpConfiguration/all/usePreemptive.
+				 These properties can only be set as system properties or defined in a profile that is activated via settings/activeProfiles.
+				 See also: https://maven.apache.org/guides/mini/guide-resolver-transport.html#Low-level_Resolver_configuration -->
+			<properties>
+				<!-- Jenkins repositories for upstream builds require preemptive authentication. (for http transporter, Maven 3.9+) -->
+				<aether.connector.http.preemptiveAuth.jenkins>true</aether.connector.http.preemptiveAuth.jenkins>
+			</properties>
+			
+			<!-- These repository configs are required to anable snapshots. 
+			 	 Snapshots are not enabled (in central) if only mirror is configured. -->
+			<repositories>
+				<repository>
+					<id>all-dependencies</id>
+					<url>https://gebit-nexus.local.gebit.de/content/groups/gebit-dependencies</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>all-plugins</id>
+					<url>https://gebit-nexus.local.gebit.de/content/groups/gebit-dependencies</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+
+		<!-- Order is important here: this must be last -->
+		<profile>
+			<id>jenkins-maven-upstream</id>
+			<activation>
+				<property>
+					<name>env.JENKINS_REPOSITORY</name>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>jenkins</id>
+					<url>${env.JENKINS_REPOSITORY}</url>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>jenkins</id>
+					<url>${env.JENKINS_REPOSITORY}</url>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>nexus-profile</activeProfile>
+	</activeProfiles>
+</settings>

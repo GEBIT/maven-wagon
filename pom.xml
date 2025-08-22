@@ -157,6 +157,14 @@ under the License.
   </distributionManagement>
 
   <properties>
+    <!-- GEBIT: versions to be used for gebit-build support -->
+    <version.build>3.12.0</version.build>
+    <version.tiles>2.8-gebit40</version.tiles>
+    <version.gebit-build-extension>2.0.0</version.gebit-build-extension>
+    <version.gebit-forked>1.0.6</version.gebit-forked>
+    <tiles.applyBefore>org.apache.maven.wagon:wagon</tiles.applyBefore>
+    <!-- GEBIT: end -->
+
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <slf4jVersion>1.7.36</slf4jVersion>
     <maven.site.path>wagon-archives/wagon-LATEST</maven.site.path>
@@ -292,6 +300,22 @@ under the License.
       </plugins>
     </pluginManagement>
     <plugins>
+      <!-- GEBIT: Tiles -->
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>${version.tiles}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <applyBefore>${tiles.applyBefore}</applyBefore>
+          <mergeTarget>${tiles.applyBefore}</mergeTarget>
+          <tiles>
+            <tile>de.gebit.build.forked.tile:maven-plugin:${version.gebit-forked}</tile>
+          </tiles>
+        </configuration>
+      </plugin>
+      <!-- GEBIT: end -->
+
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -305,6 +329,16 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+
+    <!-- GEBIT: Extensions -->
+    <extensions>
+      <extension>
+        <groupId>de.gebit.build.maven</groupId>
+        <artifactId>gebit-build-extension</artifactId>
+        <version>${version.gebit-build-extension}</version>
+      </extension>
+    </extensions>
+    <!-- GEBIT: end -->
   </build>
 
   <profiles>
