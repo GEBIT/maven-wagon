@@ -29,22 +29,23 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
+import com.jcraft.jsch.AgentConnector;
+import com.jcraft.jsch.AgentIdentityRepository;
+import com.jcraft.jsch.AgentProxyException;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
 import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.PageantConnector;
 import com.jcraft.jsch.Proxy;
 import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.ProxySOCKS5;
+import com.jcraft.jsch.SSHAgentConnector;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
-import com.jcraft.jsch.agentproxy.AgentProxyException;
-import com.jcraft.jsch.agentproxy.Connector;
-import com.jcraft.jsch.agentproxy.ConnectorFactory;
-import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 import org.apache.maven.wagon.CommandExecutionException;
 import org.apache.maven.wagon.CommandExecutor;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -133,11 +134,14 @@ public abstract class AbstractJschWagon extends StreamWagon implements SshWagon,
             }
         } else {
             try {
-                Connector connector = ConnectorFactory.getDefault().createConnector();
-                if (connector != null) {
-                    IdentityRepository repo = new RemoteIdentityRepository(connector);
-                    sch.setIdentityRepository(repo);
+                AgentConnector connector;
+                try {
+                    connector = new PageantConnector();
+                } catch (AgentProxyException exc) {
+                    connector = new SSHAgentConnector();
                 }
+                IdentityRepository repo = new AgentIdentityRepository(connector);
+                sch.setIdentityRepository(repo);
             } catch (AgentProxyException e) {
                 fireSessionDebug("Unable to connect to agent: " + e.toString());
             }

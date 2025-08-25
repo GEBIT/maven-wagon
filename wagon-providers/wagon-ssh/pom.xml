@@ -31,23 +31,36 @@ under the License.
 
   <properties>
     <sshd.stopImmediatly>false</sshd.stopImmediatly>
+    <version.jsch>2.27.0</version.jsch>
+    <version.jna>5.17.0</version.jna>
+    <version.junixsocket>2.10.1</version.junixsocket>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>com.jcraft</groupId>
+      <groupId>com.github.mwiede</groupId>
       <artifactId>jsch</artifactId>
-      <version>0.1.55</version>
+      <version>${version.jsch}</version>
     </dependency>
     <dependency>
-      <groupId>com.jcraft</groupId>
-      <artifactId>jsch.agentproxy.connector-factory</artifactId>
-      <version>0.0.9</version>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>${version.jna}</version>
     </dependency>
     <dependency>
-      <groupId>com.jcraft</groupId>
-      <artifactId>jsch.agentproxy.jsch</artifactId>
-      <version>0.0.9</version>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
+      <version>${version.jna}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kohlschutter.junixsocket</groupId>
+      <artifactId>junixsocket-common</artifactId>
+      <version>${version.junixsocket}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kohlschutter.junixsocket</groupId>
+      <artifactId>junixsocket-native-common</artifactId>
+      <version>${version.junixsocket}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
